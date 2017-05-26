@@ -3,8 +3,6 @@
 // RUN: %clangxx_lsan %s -o %t
 // RUN: %env_lsan_opts=$LSAN_BASE %run %t
 // RUN: %env_lsan_opts=$LSAN_BASE not %run %t foo 2>&1 | FileCheck %s
-//
-// UNSUPPORTED: darwin
 
 #include <sanitizer/lsan_interface.h>
 

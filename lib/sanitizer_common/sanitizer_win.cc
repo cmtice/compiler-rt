@@ -554,7 +554,7 @@ void ListOfModules::init() {
     cur_module.set(module_name, adjusted_base);
     // We add the whole module as one single address range.
     cur_module.addAddressRange(base_address, end_address, /*executable*/ true,
-                               /*writable*/ true);
+                               /*readable*/ true);
     modules_.push_back(cur_module);
   }
   UnmapOrDie(hmodules, modules_buffer_size);
@@ -832,9 +832,9 @@ void InstallDeadlySignalHandlers(SignalHandlerType handler) {
   // FIXME: Decide what to do on Windows.
 }
 
-HandleSignalMode GetHandleSignalMode(int signum) {
+bool IsHandledDeadlySignal(int signum) {
   // FIXME: Decide what to do on Windows.
-  return kHandleSignalNo;
+  return false;
 }
 
 // Check based on flags if we should handle this exception.

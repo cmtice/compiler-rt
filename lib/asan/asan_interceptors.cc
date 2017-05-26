@@ -37,18 +37,11 @@
 namespace __asan {
 
 // Return true if we can quickly decide that the region is unpoisoned.
-// We assume that a redzone is at least 16 bytes.
 static inline bool QuickCheckForUnpoisonedRegion(uptr beg, uptr size) {
   if (size == 0) return true;
   if (size <= 32)
     return !AddressIsPoisoned(beg) &&
            !AddressIsPoisoned(beg + size - 1) &&
-           !AddressIsPoisoned(beg + size / 2);
-  if (size <= 64)
-    return !AddressIsPoisoned(beg) &&
-           !AddressIsPoisoned(beg + size / 4) &&
-           !AddressIsPoisoned(beg + size - 1) &&
-           !AddressIsPoisoned(beg + 3 * size / 4) &&
            !AddressIsPoisoned(beg + size / 2);
   return false;
 }
@@ -357,22 +350,28 @@ DEFINE_REAL_PTHREAD_FUNCTIONS
 
 #if SANITIZER_ANDROID
 INTERCEPTOR(void*, bsd_signal, int signum, void *handler) {
-  if (GetHandleSignalMode(signum) != kHandleSignalExclusive)
+  if (!IsHandledDeadlySignal(signum) ||
+      common_flags()->allow_user_segv_handler) {
     return REAL(bsd_signal)(signum, handler);
+  }
   return 0;
 }
 #endif
 
 INTERCEPTOR(void*, signal, int signum, void *handler) {
-  if (GetHandleSignalMode(signum) != kHandleSignalExclusive)
+  if (!IsHandledDeadlySignal(signum) ||
+      common_flags()->allow_user_segv_handler) {
     return REAL(signal)(signum, handler);
+  }
   return nullptr;
 }
 
 INTERCEPTOR(int, sigaction, int signum, const struct sigaction *act,
                             struct sigaction *oldact) {
-  if (GetHandleSignalMode(signum) != kHandleSignalExclusive)
+  if (!IsHandledDeadlySignal(signum) ||
+      common_flags()->allow_user_segv_handler) {
     return REAL(sigaction)(signum, act, oldact);
+  }
   return 0;
 }
 
@@ -434,13 +433,6 @@ INTERCEPTOR(void, longjmp, void *env, int val) {
 INTERCEPTOR(void, _longjmp, void *env, int val) {
   __asan_handle_no_return();
   REAL(_longjmp)(env, val);
-}
-#endif
-
-#if ASAN_INTERCEPT___LONGJMP_CHK
-INTERCEPTOR(void, __longjmp_chk, void *env, int val) {
-  __asan_handle_no_return();
-  REAL(__longjmp_chk)(env, val);
 }
 #endif
 
@@ -758,9 +750,6 @@ void InitializeAsanInterceptors() {
 #endif
 #if ASAN_INTERCEPT__LONGJMP
   ASAN_INTERCEPT_FUNC(_longjmp);
-#endif
-#if ASAN_INTERCEPT___LONGJMP_CHK
-  ASAN_INTERCEPT_FUNC(__longjmp_chk);
 #endif
 #if ASAN_INTERCEPT_SIGLONGJMP
   ASAN_INTERCEPT_FUNC(siglongjmp);

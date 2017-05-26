@@ -48,7 +48,6 @@
 
 // REQUIRES: x86-target-arch
 // REQUIRES: x86_64h
-// UNSUPPORTED: ios
 
 #include <sanitizer/common_interface_defs.h>
 #include <stdio.h>

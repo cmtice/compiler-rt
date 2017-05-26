@@ -31,16 +31,15 @@ static void MaybePrintStackTrace(uptr pc, uptr bp) {
   // will definitely be called when we print the first diagnostics message.
   if (!flags()->print_stacktrace)
     return;
-
-  uptr top = 0;
-  uptr bottom = 0;
-  bool request_fast_unwind = common_flags()->fast_unwind_on_fatal;
-  if (request_fast_unwind)
-    __sanitizer::GetThreadStackTopAndBottom(false, &top, &bottom);
-
+  // We can only use slow unwind, as we don't have any information about stack
+  // top/bottom.
+  // FIXME: It's better to respect "fast_unwind_on_fatal" runtime flag and
+  // fetch stack top/bottom information if we have it (e.g. if we're running
+  // under ASan).
+  if (StackTrace::WillUseFastUnwind(false))
+    return;
   BufferedStackTrace stack;
-  stack.Unwind(kStackTraceMax, pc, bp, nullptr, top, bottom,
-               request_fast_unwind);
+  stack.Unwind(kStackTraceMax, pc, bp, 0, 0, 0, false);
   stack.Print();
 }
 

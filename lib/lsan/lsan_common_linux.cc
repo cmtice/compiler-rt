@@ -62,10 +62,8 @@ void InitializePlatformSpecificModules() {
       return;
     }
   }
-  if (linker == nullptr) {
-    VReport(1, "LeakSanitizer: Dynamic linker not found. "
-               "TLS will not be handled correctly.\n");
-  }
+  VReport(1, "LeakSanitizer: Dynamic linker not found. "
+             "TLS will not be handled correctly.\n");
 }
 
 static int ProcessGlobalRegionsCallback(struct dl_phdr_info *info, size_t size,

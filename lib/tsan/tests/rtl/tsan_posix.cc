@@ -94,9 +94,8 @@ TEST(Posix, ThreadLocalAccesses) {
 // The test is failing with high thread count for aarch64.
 // FIXME: track down the issue and re-enable the test.
 // On Darwin, we're running unit tests without interceptors and __thread is
-// using malloc and free, which causes false data race reports.  On rare
-// occasions on powerpc64le this test also fails.
-#if !defined(__aarch64__) && !defined(__APPLE__) && !defined(powerpc64le)
+// using malloc and free, which causes false data race reports.
+#if !defined(__aarch64__) && !defined(__APPLE__)
   local_thread((void*)2);
 #endif
 }

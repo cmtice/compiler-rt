@@ -390,7 +390,7 @@ static void handleFloatCastOverflow(void *DataPtr, ValueHandle From,
   ScopedReport R(Opts, Loc, ET);
 
   Diag(Loc, DL_Error,
-       "%0 is outside the range of representable values of type %2")
+       "value %0 is outside the range of representable values of type %2")
       << Value(*FromType, From) << *FromType << *ToType;
 }
 
@@ -410,8 +410,7 @@ static void handleLoadInvalidValue(InvalidValueData *Data, ValueHandle Val,
   SourceLocation Loc = Data->Loc.acquire();
   // This check could be more precise if we used different handlers for
   // -fsanitize=bool and -fsanitize=enum.
-  bool IsBool = (0 == internal_strcmp(Data->Type.getTypeName(), "'bool'")) ||
-                (0 == internal_strncmp(Data->Type.getTypeName(), "'BOOL'", 6));
+  bool IsBool = (0 == internal_strcmp(Data->Type.getTypeName(), "'bool'"));
   ErrorType ET =
       IsBool ? ErrorType::InvalidBoolLoad : ErrorType::InvalidEnumLoad;
 

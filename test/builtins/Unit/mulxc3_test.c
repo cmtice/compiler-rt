@@ -19,7 +19,6 @@
 #include <complex.h>
 #include <stdio.h>
 
-// UNSUPPORTED: mips
 // REQUIRES: c99-complex
 
 // Returns: the product of a + ib and c + id

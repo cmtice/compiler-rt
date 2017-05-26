@@ -91,7 +91,12 @@ LoadedModule *GetLinker() { return nullptr; }
 
 // Required on Linux for initialization of TLS behavior, but should not be
 // required on Darwin.
-void InitializePlatformSpecificModules() {}
+void InitializePlatformSpecificModules() {
+  if (flags()->use_tls) {
+    Report("use_tls=1 is not supported on Darwin.\n");
+    Die();
+  }
+}
 
 // Scans global variables for heap pointers.
 void ProcessGlobalRegions(Frontier *frontier) {
@@ -105,8 +110,7 @@ void ProcessGlobalRegions(Frontier *frontier) {
 
     for (const __sanitizer::LoadedModule::AddressRange &range :
          modules[i].ranges()) {
-      // Sections storing global variables are writable and non-executable
-      if (range.executable || !range.writable) continue;
+      if (range.executable || !range.readable) continue;
 
       ScanGlobalRange(range.beg, range.end, frontier);
     }
@@ -140,11 +144,6 @@ void ProcessPlatformSpecificAllocations(Frontier *frontier) {
     if (info.user_tag == VM_MEMORY_OS_ALLOC_ONCE) {
       ScanRangeForPointers(address, end_address, frontier, "GLOBAL",
                            kReachable);
-
-      // Recursing over the full memory map is very slow, break out
-      // early if we don't need the full iteration.
-      if (!flags()->use_root_regions || !root_regions->size())
-        break;
     }
 
     // This additional root region scan is required on Darwin in order to

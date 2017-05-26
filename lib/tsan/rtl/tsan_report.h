@@ -108,7 +108,6 @@ struct ReportMutex {
 class ReportDesc {
  public:
   ReportType typ;
-  uptr tag;
   Vector<ReportStack*> stacks;
   Vector<ReportMop*> mops;
   Vector<ReportLocation*> locs;

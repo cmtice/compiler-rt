@@ -2,8 +2,6 @@
 // XFAIL: aarch64
 // test fails for aarch64 (see pr32260)
 
-// UNSUPPORTED: mips
-
 //===-- fixxfti_test.c - Test __fixxfti -----------------------------------===//
 //
 //                     The LLVM Compiler Infrastructure

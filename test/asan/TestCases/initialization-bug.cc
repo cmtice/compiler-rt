@@ -10,7 +10,6 @@
 
 // The test is expected to fail on OS X Yosemite and older
 // UNSUPPORTED: osx-no-ld64-live_support
-// UNSUPPORTED: ios
 
 #include <cstdio>
 

@@ -8,7 +8,6 @@
 
 // FIXME: copy %t.log back from the device and re-enable on Android.
 // UNSUPPORTED: android
-// UNSUPPORTED: ios
 
 #include <assert.h>
 #include <stdio.h>

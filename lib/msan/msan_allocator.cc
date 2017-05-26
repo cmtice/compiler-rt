@@ -47,18 +47,12 @@ struct MsanMapUnmapCallback {
   static const uptr kRegionSizeLog = 20;
   static const uptr kNumRegions = SANITIZER_MMAP_RANGE_SIZE >> kRegionSizeLog;
   typedef TwoLevelByteMap<(kNumRegions >> 12), 1 << 12> ByteMap;
+  typedef CompactSizeClassMap SizeClassMap;
 
-  struct AP32 {
-    static const uptr kSpaceBeg = 0;
-    static const u64 kSpaceSize = SANITIZER_MMAP_RANGE_SIZE;
-    static const uptr kMetadataSize = sizeof(Metadata);
-    typedef __sanitizer::CompactSizeClassMap SizeClassMap;
-    static const uptr kRegionSizeLog = __msan::kRegionSizeLog;
-    typedef __msan::ByteMap ByteMap;
-    typedef MsanMapUnmapCallback MapUnmapCallback;
-    static const uptr kFlags = 0;
-  };
-  typedef SizeClassAllocator32<AP32> PrimaryAllocator;
+  typedef SizeClassAllocator32<0, SANITIZER_MMAP_RANGE_SIZE, sizeof(Metadata),
+                               SizeClassMap, kRegionSizeLog, ByteMap,
+                               MsanMapUnmapCallback> PrimaryAllocator;
+
 #elif defined(__x86_64__)
 #if SANITIZER_LINUX && !defined(MSAN_LINUX_X86_64_OLD_MAPPING)
   static const uptr kAllocatorSpace = 0x700000000000ULL;
@@ -96,18 +90,11 @@ struct MsanMapUnmapCallback {
   static const uptr kRegionSizeLog = 20;
   static const uptr kNumRegions = SANITIZER_MMAP_RANGE_SIZE >> kRegionSizeLog;
   typedef TwoLevelByteMap<(kNumRegions >> 12), 1 << 12> ByteMap;
+  typedef CompactSizeClassMap SizeClassMap;
 
-  struct AP32 {
-    static const uptr kSpaceBeg = 0;
-    static const u64 kSpaceSize = SANITIZER_MMAP_RANGE_SIZE;
-    static const uptr kMetadataSize = sizeof(Metadata);
-    typedef __sanitizer::CompactSizeClassMap SizeClassMap;
-    static const uptr kRegionSizeLog = __msan::kRegionSizeLog;
-    typedef __msan::ByteMap ByteMap;
-    typedef MsanMapUnmapCallback MapUnmapCallback;
-    static const uptr kFlags = 0;
-  };
-  typedef SizeClassAllocator32<AP32> PrimaryAllocator;
+  typedef SizeClassAllocator32<0, SANITIZER_MMAP_RANGE_SIZE, sizeof(Metadata),
+                               SizeClassMap, kRegionSizeLog, ByteMap,
+                               MsanMapUnmapCallback> PrimaryAllocator;
 #endif
 typedef SizeClassAllocatorLocalCache<PrimaryAllocator> AllocatorCache;
 typedef LargeMmapAllocator<MsanMapUnmapCallback> SecondaryAllocator;

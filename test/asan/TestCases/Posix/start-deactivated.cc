@@ -19,7 +19,6 @@
 // RUN:   ASAN_ACTIVATION_OPTIONS=help=1,handle_segv=0,verbosity=1 not %run %t 2>&1 | FileCheck %s --check-prefix=CHECK-UNSUPPORTED
 
 // XFAIL: arm-linux-gnueabi
-// UNSUPPORTED: ios
 
 // END.
 
